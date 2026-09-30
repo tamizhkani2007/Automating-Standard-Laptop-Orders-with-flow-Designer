@@ -1,0 +1,54 @@
+(function execute(inputs, outputs) {
+
+    var request = new GlideRecord('sc_req_item');
+
+    if (request.get(inputs.request_id)) {
+
+        var laptopType = request.variables.laptop_type;
+        var requestedFor = request.requested_for;
+        var quantity = request.variables.quantity;
+        var department = request.variables.department;
+
+        outputs.request_number = request.number;
+        outputs.requested_for = requestedFor;
+        outputs.laptop_type = laptopType;
+
+        if (laptopType == 'standard') {
+
+            outputs.approval_required = true;
+            outputs.status = 'Pending Approval';
+            outputs.message = 'Standard laptop order detected';
+
+            if (quantity > 0) {
+
+                outputs.task_required = true;
+                outputs.task_description =
+                    'Process standard laptop order';
+
+                outputs.priority = 3;
+
+            } else {
+
+                outputs.task_required = false;
+                outputs.message = 'Invalid laptop quantity';
+
+            }
+
+        } else {
+
+            outputs.approval_required = false;
+            outputs.task_required = false;
+            outputs.status = 'Not Applicable';
+            outputs.message = 'Not a standard laptop order';
+
+        }
+
+    } else {
+
+        outputs.approval_required = false;
+        outputs.task_required = false;
+        outputs.message = 'Request not found';
+
+    }
+
+})(inputs, outputs);
